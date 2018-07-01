@@ -1,6 +1,6 @@
+####################### ЧАСТЬ-1.
 # Scatterplot matrix // матрица графиков диаграммы рассеяния (точечной диаграммы) через библиотеку GGally
 require(GGally)
-
 # ЧАСТЬ 1: делаем data.frame
 	# шаг-1. вчитываем таблицу. делаем из нее датафрейм.
 MDFGeo <- read.csv("GeoMorphology.csv", header=TRUE, sep = ",")
@@ -13,19 +13,69 @@ head(MDFGeo)
 # Check correlation between variables
 cor(MDF) 
  
-# Check correlations (as scatterplots), distribution and print corrleation coefficient 
-pi<- ggpairs(MDFGeo, axisLabels = "show") 
-
+# вариант-1, с полями Check correlations (as scatterplots), distribution and print corrleation coefficient 
+pi<- ggpairs(MDFGeo, axisLabels = "show",
+	title = "Mariana Trench: Scatterplot Correlation Matrix", 
+	labeller = "label_parsed",
+	upper = list(continuous = wrap("density", alpha = 0.5), combo = "box_no_facet"),
+	lower = list(combo = "denstrip")) 
+pi
 pair<- pi + theme(axis.text.x = element_text(face = 3, color = "gray24", size = 6, angle = 15),
 		axis.text.y = element_text(face = 3, color = "gray24", size = 6, angle = 15))
 pair
 
- 
-# простой вариант визуализации Visualization of correlations
-ggcorr(data=MDF, method = c("everything", "pearson")) 
-        
+# вариант-2, с цифровыми значениями корреляций
+pin<- ggpairs(MDFGeo,axisLabels= "show",
+	title = "Mariana Trench: Scatterplot Correlation Matrix", )
+pin
+pair<- pi + theme(axis.text.x = element_text(face = 3, color = "gray24", size = 6, angle = 15),
+		axis.text.y = element_text(face = 3, color = "gray24", size = 6, angle = 15))
+pair
 
- ####################### ЧАСТЬ-2. Корреляционные матрицы 3-мя методами
+
+####################### ЧАСТЬ-2. тоже самое, но больше деталей.
+### Scatterplot matrix // матрица графиков диаграммы рассеяния (точечной диаграммы) через библиотеку GGally
+
+### шаг-1. вчитываем таблицу
+MDF4 <- read.csv("Morph-9-factors.csv", header=TRUE, sep = ",")
+	# шаг-2. чистим датафрейм от NA значений
+MDF4 <- na.omit(MDF4) 
+row.has.na <- apply(MDF4, 1, function(x){any(is.na(x))}) 
+sum(row.has.na) 
+head(MDF4) 
+
+# шаг-2. подгружаем библиотеки 
+
+library(data.table)
+library(GGally)
+library(ggplot2)
+
+# шаг-3. задаем факторное значение
+MDF4$slope_class <- factor(MDF4$class)
+
+# шаг-4. cтроим  и визуализируем матрицу графиков диаграммы рассеяния по крутизне склона
+sl<- ggpairs(MDF4 ,
+	title= "Mariana Trench \nScatterplot Correlation Matrix by Slope Angle Class",
+	upper = list(continuous = wrap("density", alpha = 0.5, lwd = 0.3)),
+	lower = list(continuous = wrap("points", color = "red", alpha = 0.5), 
+                  combo = wrap("box", color = "orange", alpha = 0.6, lwd = 0.3)),
+     diag = list(continuous = wrap("densityDiag",  color = "blue", alpha = 0.5, lwd = 0.3)))
+sl
+
+# шаг-5. добавляем значения насечек осей (маленький шрифт)
+pair<- sl + 
+		theme(
+		axis.text.x = element_text(face = 3, color = "gray24", size = 6, angle = 15),
+		axis.text.y = element_text(face = 3, color = "gray24", size = 6, angle = 15))		
+# шаг-6. выводим на экран матрицу графиков диаграммы рассеяния
+pair
+
+
+####################### ЧАСТЬ-3. простой вариант визуализации Visualization of correlations
+
+ggcorr(data=MDF, method = c("everything", "pearson"))   
+            
+####################### ЧАСТЬ-4. Корреляционные матрицы 3-мя методами
 MDF <- read.csv("Morphology.csv", header=TRUE, sep = ",")
 	# шаг-2. чистим датафрейм от NA значений
 MDF <- na.omit(MDF) 
